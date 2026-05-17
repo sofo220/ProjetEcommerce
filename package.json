@@ -1,0 +1,20 @@
+{
+  "name": "eccommerce",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:backend": "npm --prefix backend run build"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.11.2",
+    "@tailwindcss/vite": "^4.2.4",
+    "axios": "^1.15.2",
+    "react-redux": "^9.2.0",
+    "react-router-dom": "^7.14.2",
+    "tailwindcss": "^4.2.4"
+  }
+}
