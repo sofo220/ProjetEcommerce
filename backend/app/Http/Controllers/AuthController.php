@@ -85,7 +85,18 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $user->update(['is_seller' => true]);
+        $validated = $request->validate([
+            'seller_store_name' => 'required|string|max:255',
+            'seller_phone' => 'required|string|max:30',
+            'seller_city' => 'required|string|max:120',
+            'seller_description' => 'nullable|string|max:1000',
+        ]);
+
+        $user->update([
+            ...$validated,
+            'is_seller' => true,
+        ]);
+        $user->refresh();
 
         return response()->json([
             'message' => 'Félicitations ! Vous êtes maintenant un vendeur. Vous pouvez maintenant ajouter et gérer vos produits.',

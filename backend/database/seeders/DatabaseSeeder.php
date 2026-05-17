@@ -22,22 +22,31 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
+        $seller = User::updateOrCreate(
             ['email' => 'vendeur@shoppex.ma'],
             [
                 'name' => 'Vendeur Pro',
                 'password' => Hash::make('password123'),
                 'is_admin' => false,
                 'is_seller' => true,
+                'seller_store_name' => 'Boutique Vendeur Pro',
+                'seller_phone' => '+212 6 00 00 00 00',
+                'seller_city' => 'Casablanca',
+                'seller_description' => 'Boutique de démonstration pour gérer les produits Shoppex.',
             ]
         );
 
-        User::updateOrCreate(
+        $clientSeller = User::updateOrCreate(
             ['email' => 'client@shoppex.ma'],
             [
                 'name' => 'Client Test',
                 'password' => Hash::make('password123'),
                 'is_admin' => false,
+                'is_seller' => true,
+                'seller_store_name' => 'mahaj',
+                'seller_phone' => '+212 6 11 22 33 44',
+                'seller_city' => 'Casablanca',
+                'seller_description' => 'Boutique client avec une sélection de produits maison, mode et électronique.',
             ]
         );
 
@@ -62,5 +71,22 @@ class DatabaseSeeder extends Seeder
         Product::updateOrCreate(['slug' => 'tapis-marocain'], ['category_id' => $catMaison->id, 'name' => 'Tapis Marocain', 'price' => 1499.00, 'stock' => 10, 'description' => 'Tapis artisanal de haute qualité.', 'image' => 'https://images.unsplash.com/photo-1600166898405-da9535204843?w=500&auto=format&fit=crop&q=60']);
         Product::updateOrCreate(['slug' => 'cafetiere-elec'], ['category_id' => $catMaison->id, 'name' => 'Cafetière électrique', 'price' => 599.00, 'stock' => 20, 'description' => 'Cafetière filtre programmable.', 'image' => 'https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=500&auto=format&fit=crop&q=60']);
         Product::updateOrCreate(['slug' => 'lot-serviettes'], ['category_id' => $catMaison->id, 'name' => 'Lot serviettes de bain', 'price' => 249.00, 'stock' => 80, 'description' => '3 serviettes 100% coton doux.', 'image' => 'https://images.unsplash.com/photo-1617957743103-310accdf7005?w=900&auto=format&fit=crop&q=80']);
+
+        Product::whereNull('seller_id')->update(['seller_id' => $seller->id]);
+
+        $clientProducts = [
+            ['slug' => 'montre-connectee-sport-client', 'category_id' => $catElectro->id, 'name' => 'Montre connectée Sport', 'price' => 349.00, 'stock' => 35, 'description' => 'Montre connectée avec suivi santé, appels et autonomie longue durée.', 'image' => 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80'],
+            ['slug' => 'chargeur-rapide-usb-c-65w-client', 'category_id' => $catElectro->id, 'name' => 'Chargeur rapide USB-C 65W', 'price' => 179.00, 'stock' => 60, 'description' => 'Chargeur compact compatible téléphone, tablette et ordinateur portable.', 'image' => 'https://images.unsplash.com/photo-1618577608401-64f9d492ec37?w=800&auto=format&fit=crop&q=80'],
+            ['slug' => 'sweat-coton-premium-client', 'category_id' => $catVetements->id, 'name' => 'Sweat coton premium', 'price' => 259.00, 'stock' => 42, 'description' => 'Sweat doux en coton, coupe moderne et confortable.', 'image' => 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&auto=format&fit=crop&q=80'],
+            ['slug' => 'organisateur-de-cuisine-bambou-client', 'category_id' => $catMaison->id, 'name' => 'Organisateur de cuisine bambou', 'price' => 199.00, 'stock' => 28, 'description' => 'Organisateur pratique en bambou pour tiroirs et plan de travail.', 'image' => 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&auto=format&fit=crop&q=80'],
+            ['slug' => 'parure-de-lit-2-personnes-client', 'category_id' => $catMaison->id, 'name' => 'Parure de lit 2 personnes', 'price' => 399.00, 'stock' => 22, 'description' => 'Parure douce et respirante avec housse de couette et taies.', 'image' => 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&auto=format&fit=crop&q=80'],
+        ];
+
+        foreach ($clientProducts as $product) {
+            Product::updateOrCreate(
+                ['slug' => $product['slug']],
+                [...$product, 'seller_id' => $clientSeller->id]
+            );
+        }
     }
 }

@@ -9,7 +9,8 @@ import {
   Save,
   UserCheck,
   ShoppingBag,
-  Download
+  Download,
+  Store
 } from 'lucide-react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -51,7 +52,8 @@ export default function UsersManagement() {
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = !selectedRole ||
                        (selectedRole === 'admin' && user.is_admin) ||
-                       (selectedRole === 'customer' && !user.is_admin);
+                       (selectedRole === 'seller' && user.is_seller) ||
+                       (selectedRole === 'customer' && !user.is_admin && !user.is_seller);
     return matchesSearch && matchesRole;
   });
 
@@ -65,6 +67,20 @@ export default function UsersManagement() {
     } catch (error) {
       console.error('Error updating role:', error);
       toast.error('Erreur lors de la mise à jour du rôle');
+    }
+  };
+
+  const handleSellerChange = async (user) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir ${user.is_seller ? 'retirer le rôle vendeur' : 'donner le rôle vendeur'} à "${user.name}" ?`)) return;
+
+    try {
+      await api.put(`/admin/users/${user.id}/role`, { is_seller: !user.is_seller });
+      toast.success('Statut vendeur mis à jour');
+      fetchUsers();
+      if (selectedUser?.id === user.id) setShowModal(false);
+    } catch (error) {
+      console.error('Error updating seller role:', error);
+      toast.error('Erreur lors de la mise à jour du vendeur');
     }
   };
 
@@ -97,7 +113,8 @@ export default function UsersManagement() {
   const stats = {
     total: users.length,
     admins: users.filter(u => u.is_admin).length,
-    customers: users.filter(u => !u.is_admin).length,
+    sellers: users.filter(u => u.is_seller).length,
+    customers: users.filter(u => !u.is_admin && !u.is_seller).length,
     totalRevenue: users.reduce((sum, u) => sum + (u.total_spent || 0), 0)
   };
 
@@ -149,11 +166,11 @@ export default function UsersManagement() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-green-100 text-green-600 rounded-lg">
-              <UserCheck size={20} />
+              <Store size={20} />
             </div>
             <div>
-              <p className="text-gray-500 text-sm">Clients</p>
-              <p className="text-xl font-bold text-gray-900">{stats.customers}</p>
+              <p className="text-gray-500 text-sm">Vendeurs</p>
+              <p className="text-xl font-bold text-gray-900">{stats.sellers}</p>
             </div>
           </div>
         </div>
@@ -191,6 +208,7 @@ export default function UsersManagement() {
             >
               <option value="">Tous les rôles</option>
               <option value="admin">Administrateurs</option>
+              <option value="seller">Vendeurs</option>
               <option value="customer">Clients</option>
             </select>
           </div>
@@ -229,10 +247,12 @@ export default function UsersManagement() {
                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
                       user.is_admin
                         ? 'bg-purple-100 text-purple-800'
+                        : user.is_seller
+                          ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
                     }`}>
-                      {user.is_admin ? <ShieldCheck size={14} /> : <UserCheck size={14} />}
-                      {user.is_admin ? 'Admin' : 'Client'}
+                      {user.is_admin ? <ShieldCheck size={14} /> : user.is_seller ? <Store size={14} /> : <UserCheck size={14} />}
+                      {user.is_admin ? 'Admin' : user.is_seller ? 'Vendeur' : 'Client'}
                     </span>
                   </td>
                   <td className="p-4 text-gray-500 text-sm">
@@ -261,6 +281,13 @@ export default function UsersManagement() {
                         title={user.is_admin ? 'Retirer admin' : 'Donner admin'}
                       >
                         {user.is_admin ? <Shield size={18} /> : <ShieldCheck size={18} />}
+                      </button>
+                      <button
+                        onClick={() => handleSellerChange(user)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title={user.is_seller ? 'Retirer vendeur' : 'Donner vendeur'}
+                      >
+                        <Store size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(user)}
@@ -311,9 +338,11 @@ export default function UsersManagement() {
                   <span className={`inline-flex items-center gap-1 mt-2 px-3 py-1 rounded-full text-xs font-medium ${
                     selectedUser.is_admin
                       ? 'bg-purple-100 text-purple-800'
+                      : selectedUser.is_seller
+                        ? 'bg-blue-100 text-blue-800'
                       : 'bg-green-100 text-green-800'
                   }`}>
-                    {selectedUser.is_admin ? 'Administrateur' : 'Client'}
+                    {selectedUser.is_admin ? 'Administrateur' : selectedUser.is_seller ? 'Vendeur' : 'Client'}
                   </span>
                 </div>
               </div>
@@ -332,6 +361,16 @@ export default function UsersManagement() {
                 </div>
               </div>
 
+              {selectedUser.is_seller && (
+                <div className="bg-blue-50 rounded-lg p-4 space-y-2">
+                  <p className="text-blue-900 font-semibold">Informations vendeur</p>
+                  <p className="text-sm text-blue-900">Boutique: {selectedUser.seller_store_name || '-'}</p>
+                  <p className="text-sm text-blue-900">Ville: {selectedUser.seller_city || '-'}</p>
+                  <p className="text-sm text-blue-900">Téléphone: {selectedUser.seller_phone || '-'}</p>
+                  <p className="text-sm text-blue-900">Produits: {selectedUser.total_products || 0}</p>
+                </div>
+              )}
+
               
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="text-gray-500 text-sm">Date d'inscription</p>
@@ -346,6 +385,13 @@ export default function UsersManagement() {
                 >
                   <ShieldCheck size={18} />
                   {selectedUser.is_admin ? 'Retirer admin' : 'Donner admin'}
+                </button>
+                <button
+                  onClick={() => handleSellerChange(selectedUser)}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Store size={18} />
+                  {selectedUser.is_seller ? 'Retirer vendeur' : 'Donner vendeur'}
                 </button>
                 <button
                   onClick={() => handleDelete(selectedUser)}

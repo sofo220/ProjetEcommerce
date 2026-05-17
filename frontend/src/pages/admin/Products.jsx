@@ -26,6 +26,7 @@ export default function Products() {
     price: '',
     stock: '',
     category_id: '',
+    seller_id: '',
     image: 'https://via.placeholder.com/300'
   });
   const [formErrors, setFormErrors] = useState({});
@@ -84,6 +85,7 @@ export default function Products() {
         price: product.price.toString(),
         stock: product.stock.toString(),
         category_id: product.category_id,
+        seller_id: product.seller_id || '',
         image: product.image || 'https://via.placeholder.com/300'
       });
     } else {
@@ -94,6 +96,7 @@ export default function Products() {
         price: '',
         stock: '',
         category_id: categories[0]?.id || '',
+        seller_id: '',
         image: 'https://via.placeholder.com/300'
       });
     }
@@ -110,6 +113,7 @@ export default function Products() {
       price: '',
       stock: '',
       category_id: '',
+      seller_id: '',
       image: 'https://via.placeholder.com/300'
     });
     setFormErrors({});
@@ -231,6 +235,7 @@ export default function Products() {
               <tr>
                 <th className="p-4 font-semibold text-gray-600">Produit</th>
                 <th className="p-4 font-semibold text-gray-600">Catégorie</th>
+                <th className="p-4 font-semibold text-gray-600">Vendeur</th>
                 <th className="p-4 font-semibold text-gray-600">Prix</th>
                 <th className="p-4 font-semibold text-gray-600 text-center">Stock</th>
                 <th className="p-4 font-semibold text-gray-600 text-right">Actions</th>
@@ -260,6 +265,9 @@ export default function Products() {
                       <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
                         {getCategoryName(product.category_id)}
                       </span>
+                    </td>
+                    <td className="p-4 text-sm text-gray-600">
+                      {product.seller?.seller_store_name || product.seller?.name || 'Admin'}
                     </td>
                     <td className="p-4 font-bold text-gray-900">
                       {Number(product.price).toLocaleString('fr-FR')} DH
@@ -292,7 +300,7 @@ export default function Products() {
               })}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-gray-500">
+                  <td colSpan="6" className="p-8 text-center text-gray-500">
                     {searchTerm || selectedCategory ? 'Aucun produit ne correspond à votre recherche' : 'Aucun produit'}
                   </td>
                 </tr>

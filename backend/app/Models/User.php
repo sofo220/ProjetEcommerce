@@ -16,7 +16,11 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
-        'is_seller'
+        'is_seller',
+        'seller_store_name',
+        'seller_phone',
+        'seller_city',
+        'seller_description',
     ];
 
     protected $hidden = [
@@ -34,5 +38,10 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function sellerProducts()
+    {
+        return $this->hasMany(Product::class, 'seller_id');
     }
 }

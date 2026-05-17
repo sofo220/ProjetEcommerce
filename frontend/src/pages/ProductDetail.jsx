@@ -8,7 +8,7 @@ import { Star, Truck, ShieldCheck, ArrowLeft, Plus, Minus, ShoppingCart } from '
 import { toast } from 'react-toastify';
 
 const FALLBACK_IMG = 'https://via.placeholder.com/500?text=Produit';
-const SERVIETTES_IMG = 'https://images.unsplash.com/photo-1617957743103-310accdf7005?w=900&auto=format&fit=crop&q=80';
+const SERVIETTES_IMG = 'https://images.pexels.com/photos/4210373/pexels-photo-4210373.jpeg?auto=compress&cs=tinysrgb&w=900';
 
 export default function ProductDetail() {
   const { id } = useParams();

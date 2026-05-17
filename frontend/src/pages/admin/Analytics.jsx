@@ -7,7 +7,8 @@ import {
   ShoppingCart,
   Users,
   Package,
-  Calendar
+  Calendar,
+  Store
 } from 'lucide-react';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -22,6 +23,10 @@ export default function Analytics() {
     products: [],
     categories: []
   });
+  const [sellerAnalytics, setSellerAnalytics] = useState({
+    sellers: [],
+    totals: { sellers: 0, products: 0, orders: 0, revenue: 0 }
+  });
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -31,7 +36,9 @@ export default function Analytics() {
     try {
       setLoading(true);
 
-      const response = await api.get('/admin/dashboard');
+      await api.get('/admin/dashboard');
+      const sellersResponse = await api.get('/admin/sellers/analytics');
+      setSellerAnalytics(sellersResponse.data);
 
 
       const days = selectedPeriod === '7days' ? 7 : selectedPeriod === '30days' ? 30 : 90;
@@ -239,6 +246,77 @@ export default function Analytics() {
           trend="down"
           trendValue="-2.1%"
         />
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-bold text-gray-800 flex items-center gap-2">
+            <Store size={20} className="text-blue-600" />
+            Analytics par vendeur
+          </h2>
+          <div className="text-sm text-gray-500">
+            {sellerAnalytics.totals.sellers} vendeur(s)
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <p className="text-sm text-blue-700">Vendeurs</p>
+            <p className="text-2xl font-bold text-blue-950">{sellerAnalytics.totals.sellers}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm text-gray-500">Produits</p>
+            <p className="text-2xl font-bold text-gray-900">{sellerAnalytics.totals.products}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm text-gray-500">Commandes</p>
+            <p className="text-2xl font-bold text-gray-900">{sellerAnalytics.totals.orders}</p>
+          </div>
+          <div className="bg-green-50 rounded-lg p-4">
+            <p className="text-sm text-green-700">Revenu vendeurs</p>
+            <p className="text-2xl font-bold text-green-900">{Number(sellerAnalytics.totals.revenue).toLocaleString('fr-FR')} DH</p>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="p-3 font-semibold text-gray-600">Vendeur</th>
+                <th className="p-3 font-semibold text-gray-600">Boutique</th>
+                <th className="p-3 font-semibold text-gray-600 text-center">Produits</th>
+                <th className="p-3 font-semibold text-gray-600 text-center">Commandes</th>
+                <th className="p-3 font-semibold text-gray-600 text-center">Unités</th>
+                <th className="p-3 font-semibold text-gray-600 text-right">Revenu</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {sellerAnalytics.sellers.map((seller) => (
+                <tr key={seller.id} className="hover:bg-gray-50">
+                  <td className="p-3">
+                    <p className="font-medium text-gray-900">{seller.name}</p>
+                    <p className="text-sm text-gray-500">{seller.email}</p>
+                  </td>
+                  <td className="p-3 text-gray-600">
+                    <p>{seller.store_name || '-'}</p>
+                    <p className="text-sm text-gray-500">{seller.city || ''}</p>
+                  </td>
+                  <td className="p-3 text-center">{seller.products}</td>
+                  <td className="p-3 text-center">{seller.orders}</td>
+                  <td className="p-3 text-center">{seller.units_sold}</td>
+                  <td className="p-3 text-right font-bold text-gray-900">
+                    {Number(seller.revenue).toLocaleString('fr-FR')} DH
+                  </td>
+                </tr>
+              ))}
+              {sellerAnalytics.sellers.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="p-6 text-center text-gray-500">Aucun vendeur pour le moment</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {}

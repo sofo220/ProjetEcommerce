@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 const FALLBACK_IMG = 'https://via.placeholder.com/300?text=Produit';
-const SERVIETTES_IMG = 'https://images.unsplash.com/photo-1617957743103-310accdf7005?w=900&auto=format&fit=crop&q=80';
+const SERVIETTES_IMG = 'https://images.pexels.com/photos/4210373/pexels-photo-4210373.jpeg?auto=compress&cs=tinysrgb&w=900';
 
 const normalize = (v) => String(v || '').trim().toLowerCase();
 const getPreferredImage = (product) => {

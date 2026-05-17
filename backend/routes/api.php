@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SellerController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -25,6 +26,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cart', [CartController::class, 'store']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
 
+    Route::prefix('seller')->middleware('is_seller')->group(function () {
+        Route::get('/dashboard', [SellerController::class, 'dashboard']);
+        Route::get('/products', [SellerController::class, 'products']);
+        Route::post('/products', [SellerController::class, 'storeProduct']);
+        Route::put('/products/{id}', [SellerController::class, 'updateProduct']);
+        Route::delete('/products/{id}', [SellerController::class, 'deleteProduct']);
+        Route::get('/categories', [SellerController::class, 'categories']);
+    });
+
     Route::prefix('admin')->middleware('is_admin')->group(function () {
 
         Route::get('/dashboard', [AdminController::class, 'dashboard']);
@@ -37,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [AdminController::class, 'users']);
         Route::put('/users/{id}/role', [AdminController::class, 'updateUserRole']);
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
+        Route::get('/sellers/analytics', [AdminController::class, 'sellerAnalytics']);
 
         Route::get('/categories', [AdminController::class, 'categories']);
 

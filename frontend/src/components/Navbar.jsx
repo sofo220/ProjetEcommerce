@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, loginSuccess } from '../store/authSlice';
+import { logout } from '../store/authSlice';
 import { LogOut, Menu, ShoppingCart, User, Search, Store } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import api from '../services/api';
@@ -28,30 +28,12 @@ export default function Navbar() {
         navigate('/');
     };
 
-    const handleBecomeSeller = async () => {
+    const handleBecomeSeller = () => {
         if (!token) {
             navigate('/login');
             return;
         }
-
-        try {
-            const response = await api.post('/become-seller', {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-
-            dispatch(loginSuccess({
-                user: response.data.user,
-                token: token
-            }));
-
-            navigate('/seller');
-        } catch (error) {
-            console.error('Error becoming seller:', error);
-            if (error.response?.status === 400) {
-
-                navigate('/seller');
-            }
-        }
+        navigate('/become-seller');
     };
 
     return (
@@ -85,7 +67,7 @@ export default function Navbar() {
                                 <div className="p-3 border-b border-gray-100 font-semibold text-sm">Mon Compte</div>
                                 <Link to="/account" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600">Vos commandes</Link>
                                 <Link to="/account" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600">Vos informations</Link>
-                                {user?.is_admin === 1 && (
+                                {user?.is_admin === true && (
                                     <Link to="/admin" className="block px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 font-medium">Dashboard Admin</Link>
                                 )}
                                 <button

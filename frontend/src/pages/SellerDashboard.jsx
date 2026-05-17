@@ -60,7 +60,7 @@ export default function SellerDashboard() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/admin/products', {
+      const response = await api.get('/seller/products', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProducts(response.data);
@@ -74,7 +74,7 @@ export default function SellerDashboard() {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/admin/categories', {
+      const response = await api.get('/seller/categories', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCategories(response.data);
@@ -96,7 +96,7 @@ export default function SellerDashboard() {
 
   const fetchStats = async () => {
     try {
-      const response = await api.get('/admin/dashboard', {
+      const response = await api.get('/seller/dashboard', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStats(response.data.stats);
@@ -169,12 +169,12 @@ export default function SellerDashboard() {
 
     try {
       if (editingProduct) {
-        await api.put(`/admin/products/${editingProduct.id}`, formData, {
+        await api.put(`/seller/products/${editingProduct.id}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Produit mis à jour avec succès');
       } else {
-        await api.post('/admin/products', formData, {
+        await api.post('/seller/products', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
         toast.success('Produit créé avec succès');
@@ -192,7 +192,7 @@ export default function SellerDashboard() {
     if (!window.confirm(`Êtes-vous sûr de vouloir supprimer "${product.name}" ?`)) return;
 
     try {
-      await api.delete(`/admin/products/${product.id}`, {
+      await api.delete(`/seller/products/${product.id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Produit supprimé avec succès');
@@ -240,14 +240,14 @@ export default function SellerDashboard() {
               <div className="flex items-center gap-3">
                 <Store size={40} />
                 <div>
-                  <h1 className="text-3xl font-bold">Espace Vendeur</h1>
-                  <p className="text-white/80">Gérez vos produits et commandes</p>
+                  <h1 className="text-3xl font-bold">{user?.seller_store_name || 'Espace Vendeur'}</h1>
+                  <p className="text-white/80">Gérez vos produits, vos stocks et vos ventes</p>
                 </div>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full">
               <Store size={20} />
-              <span className="font-semibold">{user?.name}</span>
+              <span className="font-semibold">{user?.seller_city || user?.name}</span>
             </div>
           </div>
         </div>

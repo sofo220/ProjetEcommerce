@@ -30,6 +30,7 @@ import Analytics from './pages/admin/Analytics';
 import Settings from './pages/admin/Settings';
 
 import SellerDashboard from './pages/SellerDashboard';
+import BecomeSeller from './pages/BecomeSeller';
 
 function App() {
   return (
@@ -162,6 +163,15 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/become-seller" element={
+          <ProtectedRoute>
+            <Navbar />
+            <main className="flex-1 w-full">
+              <BecomeSeller />
+            </main>
+            <Footer />
+          </ProtectedRoute>
+        } />
 
         {}
         <Route path="/admin" element={
@@ -178,7 +188,11 @@ function App() {
         </Route>
 
         {}
-        <Route path="/seller" element={<SellerDashboard />} />
+        <Route path="/seller" element={
+          <ProtectedRoute requireSeller={true}>
+            <SellerDashboard />
+          </ProtectedRoute>
+        } />
 
         {}
         <Route path="*" element={<Navigate to="/" replace />} />
